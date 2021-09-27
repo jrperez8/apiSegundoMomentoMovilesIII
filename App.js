@@ -34,7 +34,7 @@ export default class App extends Component {
         student_class: this.state.TextInput_Student_Class,
         student_phone_num: this.state.TextInput_Student_Phone_Num,
         student_email: this.state.TextInput_Student_Email,
-      })
+      }),
     })
       .then((response) => response.json())
       .then((responseJson) => {
@@ -43,9 +43,68 @@ export default class App extends Component {
       .catch((error) => {
         console.error(error);
       });
-    } 
-    FindStudent = () => {
-      fetch("http://localhost:80/apireactnativeacademic/ShowStudentxId.php", {
+  };
+  FindStudent = () => {
+    fetch("http://localhost:80/apireactnativeacademic/ShowStudentxId.php", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        student_id: this.state.TextInput_Student_ID,
+      }),
+    })
+      .then((response) => response.json())
+      .then((responseJson) => {
+        this.setState({
+          TextInput_Student_Name: responseJson[0]["student_name"],
+          TextInput_Student_Class: responseJson[0]["student_class"],
+          TextInput_Student_Phone_Num: responseJson[0]["student_phone_num"],
+          TextInput_Student_Email: responseJson[0]["student_email"],
+        });
+      })
+      .catch((error) => {
+        alert("No se encuentra el Id");
+        this.setState({
+          TextInput_Student_ID: "",
+          TextInput_Student_Name: "",
+          TextInput_Student_Class: "",
+          TextInput_Student_Phone_Num: "",
+          TextInput_Student_Email: "",
+        });
+      });
+  };
+  UpdateStudent = () => {
+    fetch(
+      "http://localhost:80/apireactnativeacademic/UpdateStudentRecord.php",
+      {
+        method: "PUT",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          student_id: this.state.TextInput_Student_ID,
+          student_name: this.state.TextInput_Student_Name,
+          student_class: this.state.TextInput_Student_Class,
+          student_phone_num: this.state.TextInput_Student_Phone_Num,
+          student_email: this.state.TextInput_Student_Email,
+        }),
+      }
+    )
+      .then((response) => response.json())
+      .then((responseJson) => {
+        alert("Estudiante actualizado correctamente ...");
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+  DeleteStudent = () => {
+    fetch(
+      "http://localhost:80/apireactnativeacademic/DeleteStudentRecord.php",
+      {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -53,68 +112,41 @@ export default class App extends Component {
         },
         body: JSON.stringify({
           student_id: this.state.TextInput_Student_ID,
-        })
-      })
-        .then((response) => response.json())
-        .then((responseJson) => {
-          this.setState({
-            TextInput_Student_Name: responseJson[0]["student_name"],
-            TextInput_Student_Class: responseJson[0]["student_class"],
-            TextInput_Student_Phone_Num: responseJson[0]["student_phone_num"],
-            TextInput_Student_Email: responseJson[0]["student_email"]
-          })
-        })
-        .catch((error) => {
-          alert("No se encuentra el Id");
-          this.setState({
-            TextInput_Student_ID: "",
-            TextInput_Student_Name: "",
-            TextInput_Student_Class: "",
-            TextInput_Student_Phone_Num: "",
-            TextInput_Student_Email: ""
-          })
-        });
+        }),
       }
-        UpdateStudent = () => {
-
-          fetch('http://localhost:80/apireactnativeacademic/UpdateStudentRecord.php', {
-            method: 'PUT',
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              student_id: this.state.TextInput_Student_ID,
-              student_name: this.state.TextInput_Student_Name,
-              student_class: this.state.TextInput_Student_Class,
-              student_phone_num: this.state.TextInput_Student_Phone_Num,
-              student_email: this.state.TextInput_Student_Email
-            })
-          }).then((response) => response.json())
-            .then((responseJson) => {
-              alert("Estudiante actualizado correctamente ...")
-      
-            }).catch((error) => {
-              console.error(error);
-            });
-        }
-            DeleteStudent = () => {
-              fetch('http://localhost:80/apireactnativeacademic/DeleteStudentRecord.php', {
-                method: 'POST',
-                headers: {
-                  'Accept': 'application/json',
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                  student_id: this.state.TextInput_Student_ID
-                })
-              }).then((response) => response.json())
-                .then((responseJson) => {
-                  alert("Estudiante eliminado correctamente ...")
-                }).catch((error) => {
-                  console.error(error);
-                });
-            }
+    )
+      .then((response) => response.json())
+      .then((responseJson) => {
+        alert("Estudiante eliminado correctamente ...");
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+  AllStudents = () =>{
+    fetch(
+      "http://localhost:80/apireactnativeacademic/ShowAllStudentsList.php",
+      {
+        method:"POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          
+        })
+      }
+    )
+  };
+  CleanStudents = () => {
+    this.setState({
+      TextInput_Student_ID: "",
+      TextInput_Student_Name: "",
+      TextInput_Student_Class: "",
+      TextInput_Student_Phone_Num: "",
+      TextInput_Student_Email: "",
+    });
+  }
   render() {
     return (
       <View style={styles.MainContainer}>
@@ -202,6 +234,13 @@ export default class App extends Component {
         >
           <Text style={styles.TextStyle}> Listar </Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          activeOpacity={0.4}
+          style={styles.TouchableOpacityStyle}
+          onPress={this.CleanStudents}
+        >
+          <Text style={styles.TextStyle}> Limpiar </Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -231,7 +270,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginBottom: 7,
     width: "90%",
-    backgroundColor: "#00BCD4",
+    backgroundColor: "orange",
   },
 
   TextStyle: {
